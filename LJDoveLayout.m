@@ -9,7 +9,7 @@
 //#import "LJDoveDelegate.h"
 
 @interface LJDoveLayout ()
-@property (nonatomic, assign) NSUInteger itemCnt;
+@property (nonatomic, assign) NSInteger itemCnt;
 @property (nonatomic, strong) NSMutableArray *attributes;
 
 @end
@@ -22,14 +22,25 @@
         self.cellWidth = kCellW;
         self.cellHeight = kCellH;
         self.cardOffset = 80;
+        super.scrollDirection = UICollectionViewScrollDirectionHorizontal;
     }
     return self;
 }
 
+- (void)setScrollDirection:(UICollectionViewScrollDirection)scrollDirection {
+    NSAssert(NO, @"不能修改滚动方向，目前只支持横向效果~");
+}
+
+- (CGSize)collectionViewContentSize {
+    CGFloat cw = self.collectionView.bounds.size.width;
+    CGFloat ch = self.collectionView.bounds.size.height;
+    
+    CGFloat w = self.itemCnt * cw;
+    return CGSizeMake(w, ch);
+}
 
 - (CGFloat)cellWidth {
     if (_cellWidth <= 0.1) {
-        NSIndexPath *idx = [NSIndexPath indexPathForItem:0 inSection:0];
         
         _cellWidth = self.itemSize.width;
     }
@@ -42,9 +53,16 @@
     return YES;
 }
 
+- (void)reset {
+    [self.attributes removeAllObjects];
+    self.itemCnt = 0;
+}
 
 - (void)prepareLayout {
     [super prepareLayout];
+    if (self.attributes.count > 0) {
+        return;
+    }
     
     self.itemCnt = [self.collectionView numberOfItemsInSection:0];
     
@@ -70,15 +88,17 @@
 {
     CGFloat offx = self.collectionView.contentOffset.x;
     //最上层卡片的idx
-    NSUInteger topmostIdx = offx/self.cellWidth;
-    // NSLog(@"xllog curIdx:%d", topmostIdx);
+    NSInteger topmostIdx = offx/self.cellWidth;
+    
+    NSInteger i = indexPath.item;
+    
     //创建布局实例
     UICollectionViewLayoutAttributes *attr = [self.attributes objectAtIndex:indexPath.item];
     
     attr.size = CGSizeMake(self.cellWidth, self.cellHeight);
     
     CGFloat xPosition = attr.frame.origin.x;
-    NSUInteger i = indexPath.item;
+    
     
     
     if (i < topmostIdx) {
@@ -124,18 +144,35 @@
 ////重写layoutAttributesForElementsInRect,设置所有cell的布局属性（包括item、header、footer）
 - (NSArray *)layoutAttributesForElementsInRect:(CGRect)rect
 {
-    NSMutableArray *arrayM = [NSMutableArray array];
     NSInteger count = [self.collectionView numberOfItemsInSection:0];
     
-    //给每一个item创建并设置布局属性
-    for (int i = 0; i < count; i++)
-    {
-        //创建item的布局属性
-        UICollectionViewLayoutAttributes *attrs = [self layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:i inSection:0]];
+    if (self.attributes.count == self.itemCnt && self.itemCnt > 0) {
         
-         [arrayM addObject:attrs];
+        CGFloat offx = self.collectionView.contentOffset.x;
+        //最上层卡片的idx
+        NSInteger topmostIdx = offx/self.cellWidth;
+        
+        for (short i=topmostIdx-1; i<=topmostIdx+1; i++) {
+            //保护数组别越界
+            if (!(i<0 || i >= self.itemCnt)) {
+                UICollectionViewLayoutAttributes *attrs = [self layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:i inSection:0]];
+                self.attributes[i] = attrs;
+            }
+        }
+        return self.attributes;
+        
+    } else {
+        NSMutableArray *arrayM = [NSMutableArray array];
+        //给每一个item创建并设置布局属性
+        for (int i = 0; i < count; i++)
+        {
+            //创建item的布局属性
+            UICollectionViewLayoutAttributes *attrs = [self layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:i inSection:0]];
+            
+             [arrayM addObject:attrs];
+        }
+        return arrayM;
     }
-    return arrayM;
 }
 
 

@@ -36,6 +36,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// 卡片从右往左出现时候 视差效果的 偏移量 默认80
 @property (nonatomic, assign) CGFloat cardOffset;
 
+- (void)reset;
+
 @end
 
 NS_ASSUME_NONNULL_END
