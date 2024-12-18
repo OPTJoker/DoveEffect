@@ -25,6 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// LJDoveLayout *layout = [[LJDoveLayout alloc] init];
 /// layout.cellWidth = 375;
 /// layout.cellHeight = 520;
+/// 或者：
+/// flowLayout.itemSize = a CGSize;
 ///
 /// _collectionView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
 ///
@@ -36,8 +38,21 @@ NS_ASSUME_NONNULL_BEGIN
 /// 卡片从右往左出现时候 视差效果的 偏移量 默认80
 @property (nonatomic, assign) CGFloat cardOffset;
 
+
+/// 如果collectionView 调用reloadData 改变了数据源，则需要调用该layout的reset方法，内部会自动重新计算layout的attributies数据源
 - (void)reset;
 
+@end
+
+
+@protocol LJDoveCellDelegate <NSObject>
+
+/// 卡片滚动进度（0 ~ 1）
+/// - Parameters:
+///   - progress: 当前卡片滑动的可见进度
+///   - curIdx: 当前卡片的index
+///   - topmostIdx: 视觉可见最上面那张卡片的index（其实就是正在随手势滑动的卡片）
+- (void)progress:(CGFloat)progress curIdx:(NSInteger)curIdx topmostIdx:(NSInteger)topmostIdx;
 @end
 
 NS_ASSUME_NONNULL_END

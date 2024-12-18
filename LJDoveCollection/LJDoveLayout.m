@@ -6,7 +6,6 @@
 //
 
 #import "LJDoveLayout.h"
-//#import "LJDoveDelegate.h"
 
 @interface LJDoveLayout ()
 @property (nonatomic, assign) NSInteger itemCnt;
@@ -19,8 +18,6 @@
 {
     self = [super init];
     if (self) {
-        self.cellWidth = kCellW;
-        self.cellHeight = kCellH;
         self.cardOffset = 80;
         super.scrollDirection = UICollectionViewScrollDirectionHorizontal;
     }
@@ -41,10 +38,21 @@
 
 - (CGFloat)cellWidth {
     if (_cellWidth <= 0.1) {
-        
         _cellWidth = self.itemSize.width;
+        if (_cellWidth <= 0.1) {
+            _cellWidth = self.collectionView.bounds.size.width;
+        }
     }
     return _cellWidth;
+}
+- (CGFloat)cellHeight {
+    if (_cellHeight <= 0.1) {
+        _cellHeight = self.itemSize.height;
+        if (_cellHeight <= 0.1) {
+            _cellHeight = self.collectionView.bounds.size.height;
+        }
+    }
+    return _cellHeight;
 }
 
 //重写shouldInvalidateLayoutForBoundsChange,每次重写布局内部都会自动调用
@@ -99,7 +107,7 @@
     
     CGFloat xPosition = attr.frame.origin.x;
     
-    
+    UICollectionViewCell<LJDoveCellDelegate> *cell = [self.collectionView cellForItemAtIndexPath:indexPath];
     
     if (i < topmostIdx) {
         xPosition = offx-self.cellWidth;
@@ -108,13 +116,13 @@
         CGFloat res = topmostIdx*self.cellWidth;
         xPosition = res;
 
-        UICollectionViewCell *cell = [self.collectionView cellForItemAtIndexPath:indexPath];
-        
         // <LJDoveDelegate>
         /* 先直接帮用户改变contentView的偏移量，并开启裁切，如果有问题，再启用这段代码，让用户自己去控制contentView或其他layer层去做mask遮罩偏移效果
-        if ([cell respondsToSelector:@selector(relativeOffx:curIdx:topmostIdx:)]) {
-            [cell relativeOffx:relaX curIdx:i topmostIdx:topmostIdx];
-        }*/
+         */
+        if ([cell respondsToSelector:@selector(progress:curIdx:topmostIdx:)]) {
+            CGFloat pro = (double)relaX/(double)self.cellWidth;
+            [cell progress:pro curIdx:i topmostIdx:topmostIdx];
+        }
         
         // 下面这段是遮罩视差效果的核心代码
         CGFloat scale = 1 - self.cardOffset/self.cellWidth;
@@ -128,6 +136,10 @@
         CGFloat relaX = fmod(offx, self.cellWidth);
         CGFloat res = offx + (1 - relaX/self.cellWidth) * self.cardOffset;
         xPosition = res;
+        if ([cell respondsToSelector:@selector(progress:curIdx:topmostIdx:)]) {
+            CGFloat pro = (double)relaX/(double)self.cellWidth;
+            [cell progress:pro curIdx:i topmostIdx:topmostIdx];
+        }
         
     } else {
         xPosition = offx + self.cardOffset;
@@ -147,7 +159,6 @@
     NSInteger count = [self.collectionView numberOfItemsInSection:0];
     
     if (self.attributes.count == self.itemCnt && self.itemCnt > 0) {
-        
         CGFloat offx = self.collectionView.contentOffset.x;
         //最上层卡片的idx
         NSInteger topmostIdx = offx/self.cellWidth;
