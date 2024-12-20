@@ -50,26 +50,6 @@ static NSString *kCellIDE = @"UICollectionViewCell";
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     LJDoveCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:kCellIDE forIndexPath:indexPath];
-    //cell.backgroundColor = [UIColor colorWithHue:(CGFloat)indexPath.item / 10.0 saturation:1.0 brightness:1.0 alpha:1.0];
-    
-    UILabel *relab = [cell.contentView viewWithTag:911];
-    UIImageView *reImg = [cell.contentView viewWithTag:912];
-    if (!relab) {
-        UILabel *lab = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, kCellW, 30)];
-        lab.numberOfLines = 0;
-        //lab.backgroundColor = UIColor.darkGrayColor;
-        lab.tag = 911;
-        lab.font = [UIFont boldSystemFontOfSize:20];
-        [cell.contentView addSubview:lab];
-        relab = lab;
-    }
-    if (!reImg) {
-        UIImageView *img = [[UIImageView alloc] initWithFrame:CGRectZero];
-        [cell.contentView addSubview:img];
-        img.frame = cell.contentView.bounds;
-        reImg = img;
-        [cell.contentView bringSubviewToFront:relab];
-    }
     
     
     NSString *s = [NSString stringWithFormat:@" idx: %ld", (long)indexPath.item];
@@ -78,8 +58,8 @@ static NSString *kCellIDE = @"UICollectionViewCell";
         ts = [ts stringByAppendingString:s];
     }
     
-    relab.text = ts;
-    reImg.image = [UIImage imageNamed:[NSString stringWithFormat:@"%ld", (long)indexPath.item%5+1]];
+    cell.lab.text = ts;
+    cell.imgView.image = [UIImage imageNamed:[NSString stringWithFormat:@"%ld", (long)indexPath.item%5+1]];
     
     return cell;
 }

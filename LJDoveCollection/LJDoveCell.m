@@ -26,4 +26,40 @@
 }
 
 
+
+- (instancetype)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self) {
+        [self setupSubviews];
+    }
+    return self;
+}
+
+- (void)setupSubviews {
+    [self addSubview:self.imgView];
+    [self addSubview:self.lab];
+}
+
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    self.imgView.frame = self.bounds;
+    self.lab.frame = CGRectMake(0, 30, self.bounds.size.width, 30);
+}
+
+
+- (UIImageView *)imgView {
+    if (!_imgView) {
+        _imgView = [[UIImageView alloc] init];
+    }
+    return _imgView;
+}
+- (UILabel *)lab {
+    if (!_lab) {
+        _lab = [[UILabel alloc] init];
+        _lab.font = [UIFont boldSystemFontOfSize:20];
+    }
+    return _lab;
+}
 @end

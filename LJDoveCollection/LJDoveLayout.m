@@ -125,12 +125,12 @@
         }
         
         // 下面这段是遮罩视差效果的核心代码
-        CGFloat scale = 1 - self.cardOffset/self.cellWidth;
-        CGFloat scalex = relaX * scale;
-        CGRect frm = cell.contentView.frame;
-        frm.origin.x = scalex;
-        cell.contentView.frame = frm;
-        cell.clipsToBounds = YES;
+//        CGFloat scale = 1 - self.cardOffset/self.cellWidth;
+//        CGFloat scalex = relaX * scale;
+//        CGRect frm = cell.contentView.frame;
+//        frm.origin.x = scalex;
+//        cell.contentView.frame = frm;
+//        cell.clipsToBounds = YES;
         
     } else if (i == topmostIdx + 1) {
         CGFloat relaX = fmod(offx, self.cellWidth);
